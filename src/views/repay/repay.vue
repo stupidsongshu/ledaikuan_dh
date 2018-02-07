@@ -5,11 +5,11 @@
     <div v-if="hasRepay">
       <div class="banner">
         <div class="title">未还本金</div>
-        <div class="amount">
+        <div class="amount" v-if="transTime">
           <span class="icon-money"></span> {{remainAmtInt}}.<span class="decimals">{{remainAmtFlo}}</span>
         </div>
         <div class="time" v-if="transTime">申请时间：{{transTime | dateFormat}}</div>
-        <div class="time" v-if="!transTime">获取数据失败，点击重试</div>
+        <div class="time" v-if="!transTime" @click="getCashExtractDetail">获取数据失败，点击重试</div>
       </div>
 
       <div class="card-wrapper">
@@ -91,7 +91,7 @@
         hasRepay: true,
         // 还款是否逾期
         overdue: false,
-        transTime: '20180115',
+        transTime: '',
         // 未还本金整数部分
         remainAmtInt: 0,
         // 未还本金小数部分
@@ -104,11 +104,64 @@
         return this.$store.state.common.deviceType
       },
       footer() {
-        // return this.$store.state.common.hasFooter
         return this.$store.state.common.deviceType === 'android'
       }
     },
+    created() {
+      this.getCashExtractDetail()
+    },
     methods: {
+      getCashExtractDetail() {
+        let that = this
+
+        let loanAcctInfo = this.$store.state.common.common_loanAcctInfo
+        if (loanAcctInfo) {
+          // 逾期状态 1逾期 2正常
+          if (loanAcctInfo.overdueStatus === 1) {
+            this.overdue = true
+          } else if (loanAcctInfo.overdueStatus === 2) {
+            this.overdue = false
+          }
+        }
+
+        // 单笔用款明细查询
+        let common_params = this.$store.state.common.common_params
+        let ua = common_params.ua
+        let call = 'Loan.cashExtractDetail'
+        let timestamp = new Date().getTime()
+        let sign = this.getSign(call, timestamp)
+
+        let paramString = JSON.stringify({
+          ua: ua,
+          call: call,
+          args: {
+            customerId: common_params.customerId,
+            loanAcctNo: loanAcctInfo.loanAcctNo
+          },
+          sign: sign,
+          timestamp: timestamp
+        })
+
+        that.loading()
+        that.$http.post(this.$store.state.common.common_api, paramString).then(res => {
+          let data = res.data
+          if (data.returnCode === '000000') {
+            // 未还本金
+            let remainAmt = data.response.remainAmt.toString()
+            that.remainAmtInt = remainAmt.substring(0, remainAmt.length - 2)
+            that.remainAmtFlo = remainAmt.substring(remainAmt.length - 2)
+            // 申请时间
+            that.transTime = data.response.transTime
+            that.$store.commit('common_cashExtractDetail_save', data.response)
+          } else {
+            that.toast({
+              message: data.returnMsg
+            })
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      },
       onTimeRepay() {
         if (this.transTime) {
           this.$router.push('/repay/onTime')

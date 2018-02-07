@@ -11,8 +11,12 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "blueimp-md5": "^2.10.0",
+    "jquery": "^3.3.1",
     "mint-ui": "^2.2.13",
+    "sui-mobile": "^0.5.9",
     "vue": "^2.5.2",
+    "vue-awesome-swiper": "^3.1.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "vuex-persist": "^1.0.3"
@@ -48,6 +52,7 @@
     "shelljs": "^0.7.6",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
+    "sui-mobile": "^0.5.9",
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
     "vconsole": "^3.1.0",

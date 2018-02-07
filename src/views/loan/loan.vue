@@ -30,7 +30,7 @@
           <span class="value">{{loanDuration}}期</span>
         </div>
         <div class="item-r">
-          <span class="name">月利率：</span>
+          <span class="name">日利率：</span>
           <span class="value">{{dayRate}}%</span>
         </div>
       </div>
@@ -48,9 +48,9 @@
       <div class="loan-item">
         <div class="agreement-wrapper">
           <input type="checkbox" id="agreementInput" :checked="checked" @click="toggleAgree">
-          <label class="agreement-label" for="agreementInput">我同意并知晓{{deviceType}}</label>
-          <a v-if="deviceType === 'android'" class="agreement" href="newtab:http://www.kahuanwang.com/agreement/loan.html">《借款协议》</a>
-          <a v-if="deviceType === 'iphone'" class="agreement" @click="loanAgreementPage">《借款协议》</a>
+          <label class="agreement-label" for="agreementInput">我同意并知晓</label>
+          <a v-if="deviceType === 'android'" class="agreement" href="http://xfjr.ledaikuan.cn/ledaikuan/agreement/loan_protocol_additional.html">《借款协议》</a>
+          <a v-if="deviceType === 'iphone'" class="agreement" @click="loanAgreementPage">《借款补充协议》</a>
         </div>
       </div>
 
@@ -70,7 +70,8 @@
       <mt-button class="btn" @click="loanBtn" :disabled="!checked">立即借款</mt-button>
     </div>
 
-    <loan-plan :overflowScroll="false" :loanPlanList="loanPlanList"></loan-plan>
+    <loan-plan v-if="loanPlanListStatus" :overflowScroll="false" :loanPlanList="loanPlanList"></loan-plan>
+    <div v-if="!loanPlanListStatus" class="get-data-fail" @click="reGetLoanPlan">获取数据失败，点击重试</div>
 
     <mt-popup
       v-model="hasPopup"
@@ -105,185 +106,53 @@
           className: 'slot'
         }],
         loanPurposeValues: [],
-        dayRate: 0,
-        openBank: '',
-        creditcardNo: '',
         vcode: '',
         loanUseId: '',
         hasGetCode: false,
         time: 60,
         loanPlanList: [],
-        checked: true
+        checked: true,
+        // 获取还款计划数据是否成功(默认成功)
+        loanPlanListStatus: true
       }
     },
     computed: {
+      dayRate() {
+        return this.$store.state.common.common_loanAcctInfo.nowDayRate
+      },
+      openBank() {
+        return this.$store.state.common.common_loanAcctInfo.decardCardIssuerName
+      },
+      creditcardNo() {
+        return this.$store.state.common.common_loanAcctInfo.debitCardNo.substr(-4)
+      },
       // 设备类型
       deviceType() {
         return this.$store.state.common.common_deviceType
       },
       loanLimit() {
-        // return this.$store.state.loan.loan_limit / 100
-        return 5000
+        return this.$store.state.loan.loan_limit / 100
       },
       loanDuration() {
-        // return this.$store.state.loan.loan_duration
-        return 12
+        return this.$store.state.loan.loan_duration
       },
-      hasPopup() {
-        return this.$store.state.common.common_hasPopup
+      // hasPopup() {
+      //   return this.$store.state.common.common_hasPopup
+      // },
+      hasPopup: {
+        get() {
+          return this.$store.state.common.common_hasPopup
+        },
+        set() {
+          
+        }
       }
     },
     created() {
-      // 本金
-      let loanLimit = this.loanLimit
-      // 分期数
-      let loanDuration = this.loanDuration
-      // 月分期费率
-      let monthRate
-      if (loanDuration === 6) {
-        // monthRate = 1.35 / 100
-        monthRate = 0.0135
-        this.dayRate = 1.35
-      } else if (loanDuration === 12) {
-        // monthRate = 1.25 / 100
-        monthRate = 0.0125
-        this.dayRate = 1.25
-      }
-
-      /**
-       * @desc 获取当前日期的下一个月前一天
-       * @param date 格式: '2017-12-18'
-       * @returns 格式: '20180117'
-       */
-      function getNextMonthAndPreviousDate(date) {
-        var arr = date.split('-')
-        var year = arr[0] // 获取当前日期的年份
-        var month = arr[1] // 获取当前日期的月份
-        var day = arr[2] // 获取当前日期的日
-
-        var year1 = year
-        var month1 = parseInt(month) + 1
-        if (month1 === 13) {
-          year1 = parseInt(year1) + 1
-          month1 = 1
-        }
-        var day1 = parseInt(day) - 1
-        // 当第三个参数为0返回上一个月的最后一天(也是天数)
-        var days1 = new Date(year1, month1, 0).getDate()
-        if (day1 > days1) {
-          day1 = days1
-        }
-        if (month1 < 10) {
-          month1 = '0' + month1
-        }
-        if (day1 < 10) {
-          day1 = '0' + day1
-        }
-
-        return year1 + '' + month1 + '' + day1
-      }
-
       // 还款试算
-      let year = new Date().getFullYear()
-      let month = new Date().getMonth()
-      let date = new Date().getDate()
-      // 分期本金
-      let prePrin = (loanLimit * 100) / loanDuration
-      // 月利率费
-      let preFee = (loanLimit * 100) * monthRate
-
-      for (var i = 0; i < loanDuration; i++) {
-        // 还款时间
-        if (parseInt(month) > 12) {
-          year = parseInt(year) + 1
-          month = 1
-        }
-        month++
-        if (parseInt(month) > 12) {
-          year = parseInt(year) + 1
-          month = 1
-        }
-        let dateFormat = year + '-' + month + '-' + date
-        let prePayDay = getNextMonthAndPreviousDate(dateFormat)
-
-        if (i < loanDuration - 1) {
-          this.loanPlanList.push({
-            // 分期数
-            paymentPeriod: i + 1,
-            prePayDay: prePayDay,
-            prePrin: prePrin,
-            preFee: preFee,
-            // 还款金额
-            preAmt: prePrin + preFee
-          })
-        } else if (i === loanDuration - 1) {
-          var prePrinBefore = ((loanLimit * 100) / loanDuration).toFixed(2)
-          var prePrinLast = loanLimit * 100 - prePrinBefore * (loanDuration - 1)
-
-          this.loanPlanList.push({
-            // 分期数
-            paymentPeriod: i + 1,
-            prePayDay: prePayDay,
-            prePrin: prePrinLast,
-            preFee: preFee,
-            // 还款金额
-            preAmt: prePrinLast + preFee
-          })
-        }
-      }
-
+      this.getRepayPlan()
       // 借款用途随机排序
-      this.loanPurposeValues = [
-        {
-          id: '1',
-          loanPurpose: '装修'
-        },
-        {
-          id: '2',
-          loanPurpose: '婚庆'
-        },
-        {
-          id: '3',
-          loanPurpose: '旅游'
-        },
-        {
-          id: '4',
-          loanPurpose: '教育'
-        },
-        {
-          id: '5',
-          loanPurpose: '租房'
-        },
-        {
-          id: '6',
-          loanPurpose: '汽车周边'
-        },
-        {
-          id: '7',
-          loanPurpose: '电子数码产品'
-        },
-        {
-          id: '8',
-          loanPurpose: '医疗'
-        },
-        {
-          id: 'A',
-          loanPurpose: '家用电器'
-        },
-        {
-          id: 'B',
-          loanPurpose: '家具家居'
-        }
-      ]
-      function randomSort() {
-        return Math.random() > 0.5 ? -1 : 1
-      }
-      this.loanPurposeValues.sort(randomSort)
-      this.loanPurposeValues.unshift({
-        id: '0',
-        loanPurpose: ' '
-      })
-      this.loanPurposeSlot[0].values = this.loanPurposeValues
+      this.randomSortLoanPurpose()
     },
     methods: {
       toggleAgree() {
@@ -330,6 +199,9 @@
       selectPurpose() {
         this.$store.commit('common_hasPopup_save', true)
 
+        // 借款用途随机排序
+        this.randomSortLoanPurpose()
+
         // fix 弹窗滑动的时候底层页面跟随滚动
         document.getElementById('loanPlanPopup').addEventListener('touchmove', function(event) {
           event.preventDefault()
@@ -356,17 +228,161 @@
           }
         }
       },
+      // 借款用途随机排序
+      randomSortLoanPurpose() {
+        this.loanPurposeValues = [
+          {
+            id: '1',
+            loanPurpose: '装修'
+          },
+          {
+            id: '2',
+            loanPurpose: '婚庆'
+          },
+          {
+            id: '3',
+            loanPurpose: '旅游'
+          },
+          {
+            id: '4',
+            loanPurpose: '教育'
+          },
+          {
+            id: '5',
+            loanPurpose: '租房'
+          },
+          {
+            id: '6',
+            loanPurpose: '汽车周边'
+          },
+          {
+            id: '7',
+            loanPurpose: '电子数码产品'
+          },
+          {
+            id: '8',
+            loanPurpose: '医疗'
+          },
+          {
+            id: 'A',
+            loanPurpose: '家用电器'
+          },
+          {
+            id: 'B',
+            loanPurpose: '家具家居'
+          }
+        ]
+        function randomSort() {
+          return Math.random() > 0.5 ? -1 : 1
+        }
+        this.loanPurposeValues.sort(randomSort)
+        this.loanPurposeValues.unshift({
+          id: '0',
+          loanPurpose: ' '
+        })
+        this.loanPurposeSlot[0].values = this.loanPurposeValues
+      },
+      // 还款试算
+      getRepayPlan() {
+        let that = this
+
+        let common_loanAcctInfo = this.$store.state.common.common_loanAcctInfo
+        let common_params = this.$store.state.common.common_params
+
+        let ua = common_params.ua
+        let call = 'Loan.repayPlan'
+        let timestamp = new Date().getTime()
+        let sign = this.getSign(call, timestamp)
+
+        let paramString = JSON.stringify({
+          ua: ua,
+          call: call,
+          args: {
+            customerId: common_params.customerId,
+            acctNo: common_loanAcctInfo.loanAcctNo,
+            queryBegNum: 1,
+            queryCnt: this.loanDuration,
+            dealFlg: 'A',
+            paymentAmount: this.loanLimit * 100,
+            installPeriod: this.loanDuration
+          },
+          sign: sign,
+          timestamp: timestamp
+        })
+
+        this.loading()
+        this.$http.post(this.$store.state.common.common_api, paramString).then(res => {
+          let data = res.data
+          if (data.returnCode === '000000') {
+            this.loanPlanListStatus = true
+            this.loanPlanList = data.response.list.splice(0, this.loanDuration)
+          } else {
+            this.toast({
+              message: data.returnMsg
+            })
+            this.this.loanPlanListStatus = false
+          }
+        }).catch(err => {
+          console.log(err)
+          this.loanPlanListStatus = false
+        })
+      },
+      reGetLoanPlan() {
+        this.loanPlanListStatus = true
+        this.getRepayPlan()
+      },
       // 获取验证码
       getCode() {
+        let that = this
+
+        let common_loanAcctInfo = this.$store.state.common.common_loanAcctInfo
+        let common_params = this.$store.state.common.common_params
+        let ua = common_params.ua
+        let call = 'Boccfc.dyanmicPwd'
+        let timestamp = new Date().getTime()
+        let sign = this.getSign(call, timestamp)
+
+        let paramString = JSON.stringify({
+          ua: ua,
+          call: call,
+          args: {
+            customerId: common_params.customerId,
+            mobileNo: common_loanAcctInfo.mobileNo,
+            acctNo: common_loanAcctInfo.loanAcctNo
+          },
+          sign: sign,
+          timestamp: timestamp
+        })
+
+        this.loading()
+        this.$http.post(this.$store.state.common.common_api, paramString).then(res => {
+          if (res.data.response === '000000') {
+            that.hasGetCode = true
+            let timer = setInterval(() => {
+              that.time --
+              if (that.time === 0) {
+                that.hasGetCode = false
+                that.time = 60
+                clearInterval(timer)
+              }
+            }, 1000)
+          } else {
+            that.toast({
+              message: res.data.returnMsg
+            })
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       },
       // 借款
       loanBtn() {
-        this.$router.replace({name: 'loanDeal'})
+        let that = this
+
         if (this.purpose === '') {
           this.toast({
             message: '请选择贷款用途'
           })
-          // this.loading()
           return
         }
         if (this.vcode.trim() === '') {
@@ -375,6 +391,46 @@
           })
           return
         }
+
+        let common_loanAcctInfo = this.$store.state.common.common_loanAcctInfo
+        let common_params = this.$store.state.common.common_params
+        let ua = common_params.ua
+        let call = 'Loan.cashExtract'
+        let timestamp = new Date().getTime()
+        let sign = this.getSign(call, timestamp)
+
+        let paramString = JSON.stringify({
+          ua: ua,
+          call: call,
+          args: {
+            customerId: common_params.customerId,
+            loanAcctNo: common_loanAcctInfo.loanAcctNo,
+            amount: this.loanLimit * 100,
+            instalPeriod: this.loanDuration,
+            comUseType: this.loanUseId,
+            dynamicPwd: this.vcode
+          },
+          sign: sign,
+          timestamp: timestamp
+        })
+
+        that.loading()
+        that.$http.post(this.$store.state.common.common_api, paramString).then(res => {
+          let data = res.data
+          if (data.returnCode === '000000') {
+            let dataS = data.response
+            // 更新汇总信息
+            that.$store.commit('common_loanAcctInfo_save', dataS.loanAcctInfo)
+            that.$store.commit('common_cashExtract_save', dataS.cashExtract)
+            that.checkLoanAcctInfo()
+          } else {
+            that.toast({
+              message: data.returnMsg
+            })
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       }
     }
   }

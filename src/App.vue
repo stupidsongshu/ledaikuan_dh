@@ -6,7 +6,10 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  beforeRouteEnter () {
+    console.log('app')
+  }
 }
 </script>
 
