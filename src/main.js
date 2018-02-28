@@ -42,31 +42,51 @@ Vue.prototype.closeLoading = function() {
   Indicator.close()
   // store.commit('common_isLoading_save', false)
 }
-Vue.prototype.toast = function(setting) {
-  // 文本内容
-  var message = ''
-  // Toast 的位置
-  var position = 'middle'
-  // 持续时间（毫秒），若为 -1 则不会自动关闭
-  var duration = 1200
+// Vue.prototype.toast = function(options) {
+//   // 文本内容
+//   var message = ''
+//   // Toast 的位置
+//   var position = 'middle'
+//   // 持续时间（毫秒），若为 -1 则不会自动关闭
+//   var duration = 1200
 
-  if (setting) {
-    if (setting.message) {
-      message = setting.message
-    }
-    if (setting.position) {
-      position = setting.position
-    }
-    if (setting.duration) {
-      duration = setting.duration
-    }
+//   // 参数options需为Object
+//   if (options) {
+//     if (options.message) {
+//       message = options.message
+//     }
+//     if (options.position) {
+//       position = options.position
+//     }
+//     if (options.duration) {
+//       duration = options.duration
+//     }
+//   }
+
+//   var toastInstance = Toast({
+//     message: message,
+//     position: position,
+//     duration: duration
+//   })
+
+//   // if (toastInstance) {
+//   //   toastInstance.close()
+//   // }
+//   // console.log(toastInstance.timer)
+// }
+
+Vue.prototype.toast = function(options) {
+  var obj = {
+    // 文本内容
+    message: '',
+    // Toast 的位置
+    position: 'middle',
+    // 持续时间（毫秒），若为 -1 则不会自动关闭
+    duration: 1200
   }
+  obj = Object.assign(obj, options)
 
-  var toastInstance = Toast({
-    message: message,
-    position: position,
-    duration: duration
-  })
+  var toastInstance = Toast(obj)
 
   // if (toastInstance) {
   //   toastInstance.close()
@@ -100,10 +120,10 @@ function parseUrl() {
   var urlparam = decodeURIComponent(window.location.href.split('?')[1])
 
   if (urlparam.indexOf('ua') === -1
-      && urlparam.indexOf('call') === -1
-      && urlparam.indexOf('args') === -1
-      && urlparam.indexOf('sign') === -1
-      && urlparam.indexOf('timestamp') === -1){
+      || urlparam.indexOf('call') === -1
+      || urlparam.indexOf('args') === -1
+      || urlparam.indexOf('sign') === -1
+      || urlparam.indexOf('timestamp') === -1){
     window.location.href = ledaikuanMainSite
     return
   }
@@ -115,7 +135,7 @@ function parseUrl() {
     sign: '',
     timestamp: ''
   }
-  
+
   var arr = urlparam.split('&')
   arr.forEach(item => {
     if (item.indexOf('ua') !== -1) {
@@ -136,14 +156,7 @@ function parseUrl() {
 }
 
 Vue.prototype.signCheck = function() {
-  // 保存公共参数 20171030183000572767
-  if (window.location.href.indexOf('?') !== -1) {
-    var obj = parseUrl()
-    console.log(obj)
-  } else {
-    window.location.href = 'http://www.ledaikuan.cn/'
-    return
-  }
+  var obj = parseUrl()
 
   let paramString = {
     'ua': obj.ua,
@@ -153,19 +166,33 @@ Vue.prototype.signCheck = function() {
     'timestamp': obj.timestamp
   }
 
+  // let paramString2 = JSON.stringify({
+  //   'ua': 'hello',
+  //   'call': 'Account.signCheck',
+  //   'args': paramString,
+  //   'sign': 'sign',
+  //   'timestamp': new Date().getTime()
+  // })
+
+  let call = 'Account.signCheck'
+  let timestamp = new Date().getTime()
+  let sign = this.getSign(call, timestamp)
   let paramString2 = JSON.stringify({
-    'ua': 'hello',
-    'call': 'Account.signCheck',
+    'ua': 'hello', // 此处ua值不为空即可
+    'call': call,
     'args': paramString,
-    'sign': 'sign',
-    'timestamp': new Date().getTime()
+    'sign': sign,
+    'timestamp': timestamp
   })
   console.log(paramString2)
+
+  this.loading()
   return new Promise((resolve, reject)=> {
     this.$http.post(store.state.common.common_api, paramString2).then(res => {
       if (res.data.returnCode === '000000') {
         let signKey = res.data.response
   
+        // 保存公共参数 20171030183000572767
         store.commit('common_params_save', {
           ua: 'LDK_H5_SIGN',
           customerId: obj.args.customerId,
@@ -355,7 +382,7 @@ Vue.prototype.reGetLoanAcctInfo = function() {
 
 Vue.prototype.init = function() {
   let that = this
-  this.signCheck().then(res=> {
+  this.signCheck().then(res => {
     let common_params = store.state.common.common_params
     let call = 'Account.acctStatus'
     let timestamp = new Date().getTime()

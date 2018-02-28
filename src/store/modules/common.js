@@ -1,16 +1,19 @@
 const state = {
   /*
-   * 设备类型
+   * common_deviceType 设备类型
   */
   common_deviceType: '',
   /**
-   * isLoading是否正在请求(默认false,请求期间屏蔽后退功能)
+   * common_isLoading 是否正在请求(默认false,请求期间屏蔽后退功能)
    */
   common_isLoading: false,
   /**
    * common_hasPopup 是否有popup组件显示(若有显示，点击后退先消失而不是直接返回上一页)
    */
   common_hasPopup: false,
+  /*
+   * common_api 公共请求接口地址
+  */
   common_api: '',
   /**
    * 公共参数包裹对象
@@ -30,7 +33,7 @@ const state = {
   common_cashRepay: {},
   /**
    * 用户借还款状态
-   * loan_status: 0借款 1还款
+   * common_loan_status: 0借款 1还款
    */
   common_loan_status: 0,
   // 单笔用款明细

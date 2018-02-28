@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from '../store'
 
-import Home from '@/views/home/home'
+import Home from '@/views/home/home2'
 import Audit from '@/views/home/audit'
 import Refuse from '@/views/home/refuse'
 import Loan from '@/views/loan/loan'
