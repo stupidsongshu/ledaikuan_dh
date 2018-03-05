@@ -1,17 +1,16 @@
  <template>
-  <swiper :options="swiperOption" v-if="phoneArr" ref="mySwiper">
-    <!--<swiper-slide class="phone-item" v-for="phone in phoneArr">
-      {{phone.number}}成功借款{{phone.amount}}元
-    </swiper-slide>-->
-    <swiper-slide class="phone-item" v-for="(user, index) in list" :key="index">
-      {{user.phone}}成功借款{{user.amount}}元
-    </swiper-slide>
-  </swiper>
+    <div class="swiper-container notice-swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide phone-item" v-for="(user, index) in list" :key="index">
+                {{user.phone}}成功借款{{user.amount}}元
+            </div>
+        </div>
+    </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import Swiper from 'swiper'
   import 'swiper/dist/css/swiper.css'
-  import {swiper, swiperSlide} from 'vue-awesome-swiper'
 
   export default {
     data() {
@@ -20,30 +19,11 @@
         list: [],
         phoneArray: [],
         ammountArray: [],
-        swiperOption: {
-          direction: 'vertical',
-          autoplay: {
-            delay: 3000
-          },
-          speed: 800,
-          loop: true,
-          // 值为true时，slide无法拖动
-          onlyExternal: true
-        },
         phoneArr: []
       }
     },
-    components: {
-      swiper,
-      swiperSlide
-    },
-    computed: {
-      swiper() {
-        return this.$refs.mySwiper.swiper
-      }
-    },
     mounted() {
-      this.swiper.allowTouchMove = false
+        this.swiperInit()
     },
     created() {
       /*
@@ -105,6 +85,37 @@
         var amount = Math.round((Math.random() * 10) + 1) * 1500
         this.list.push({phone: phone, amount: amount})
       }
+    },
+    methods: {
+        swiperInit() {
+            let swiper = new Swiper('.notice-swiper-container', {
+                direction: 'vertical',
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false
+                },
+                loop: true,
+        
+                // 如果需要分页器
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+
+                // 如果需要前进后退按钮
+                // navigation: {
+                //   nextEl: '.swiper-button-next',
+                //   prevEl: '.swiper-button-prev',
+                // },
+
+                // 如果需要滚动条
+                // scrollbar: {
+                //   el: '.swiper-scrollbar',
+                // },
+            })
+
+            swiper.allowTouchMove = false;
+        }
     }
   }
 </script>

@@ -14,10 +14,8 @@
     "blueimp-md5": "^2.10.0",
     "jquery": "^3.3.1",
     "mint-ui": "^2.2.13",
-    "sui-mobile": "^0.5.9",
-    "swiper": "^3.4.2",
+    "swiper": "^4.1.6",
     "vue": "^2.5.2",
-    "vue-awesome-swiper": "^3.1.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "vuex-persist": "^1.0.3"

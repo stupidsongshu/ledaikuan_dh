@@ -4,16 +4,16 @@
       <div class="my"></div>
       <div class="kefu"></div>
 
-      <swiper :options="swiperOption" ref="bannerSwiper">
-        <swiper-slide class="banner-item" v-for="(item, index) in bannerList" :key="index">
-          <a :href="item.imgDetailUrl" @click="bannerItemLink($event, item.imgDetailUrl)">
-            <img :src="item.imgUrl" :alt="item.imgDesc" style="width: 100%;height: 100%;">
-          </a>
-        </swiper-slide>
-
-        <!-- <div class="swiper-pagination swiper-pagination-white"></div> -->
-        <div class="swiper-pagination"  slot="pagination"></div>
-      </swiper>
+      <div class="swiper-container banner-swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide banner-item" v-for="(item, index) in bannerList" :key="index">
+            <a :href="item.imgDetailUrl" @click="bannerItemLink($event, item.imgDetailUrl)">
+              <img :src="item.imgUrl" :alt="item.imgDesc" style="width: 100%;height: 100%;">
+            </a>
+          </div>
+        </div>
+        <div class="swiper-pagination swiper-pagination-white"></div>
+      </div>
     </div>
 
     <div class="notice-wrapper">
@@ -70,115 +70,135 @@
 </template>
 
 <script>
-  import 'swiper/dist/css/swiper.css'
-  import {swiper, swiperSlide} from 'vue-awesome-swiper'
-  import notice from './../components/notice'
+import notice from "./../components/notice";
+import Swiper from "swiper";
+import 'swiper/dist/css/swiper.css'
 
-  export default {
-    name: 'home',
-    components: {
-      swiper,
-      swiperSlide,
-      notice
+export default {
+  name: "home",
+  components: {
+    notice
+  },
+  data() {
+    return {
+      bannerList: [],
+      swiperOption: {
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false
+        },
+        speed: 800,
+        loop: true,
+        pagination: {
+          el: ".swiper-pagination",
+          bulletActiveClass: "my-bullet-active"
+        },
+        observer: true,
+        observeParents: true
+      }
+    };
+  },
+  mounted() {
+    this.$http.get("http://ledaikuan.cn:8080/activity/Index/banner").then(res => {
+      this.bannerList = res.data;
+    });
+  },
+  computed: {
+    // 设备类型
+    deviceType() {
+      return this.$store.state.common.common_deviceType;
     },
-    data() {
-      return {
-        bannerList: [],
-        swiperOption: {
-          autoplay: {
-            delay: 3000,
-            disableOnInteraction: false
-          },
-          speed: 800,
-          loop: true,
-          pagination: {
-            el: '.swiper-pagination',
-            bulletActiveClass: 'my-bullet-active'
-          },
-          observer: true,
-          observeParents: true
-        }
+    footer() {
+      return this.$store.state.common.deviceType === "android";
+    },
+    // 最小额度
+    loanMin() {
+      return this.$store.state.loan.loan_min / 100;
+    },
+    // 最大额度
+    loanMax() {
+      return this.$store.state.loan.loan_max / 100;
+    },
+    // 申请额度(默认显示最大额度)
+    loanLimit: {
+      // getter
+      get: function() {
+        return this.$store.state.loan.loan_limit / 100;
+      },
+      // setter
+      set: function(newValue) {
+        this.$store.commit("loan_limit_save", newValue * 100);
       }
     },
-    mounted() {
-      let that = this
-      this.$http.get('http://ledaikuan.cn:8080/activity/Index/banner').then(res => {
-        this.$nextTick(() => {
-          this.bannerList = res.data
-          this.bannerSwiper.update(true)
-        })
+    loanDuration() {
+      return this.$store.state.loan.loan_duration;
+    },
+    activeTabIndex() {
+      return this.$store.state.common.activeTabIndex;
+    }
+  },
+  updated() {
+    this.swiperInit()
+  },
+  methods: {
+    swiperInit() {
+      let swiper = new Swiper('.banner-swiper-container', {
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false
+        },
+        loop: true,
+  
+        // 如果需要分页器
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+
+        // 如果需要前进后退按钮
+        // navigation: {
+        //   nextEl: '.swiper-button-next',
+        //   prevEl: '.swiper-button-prev',
+        // },
+
+        // 如果需要滚动条
+        // scrollbar: {
+        //   el: '.swiper-scrollbar',
+        // },
       })
     },
-    computed: {
-      bannerSwiper() {
-        return this.$refs.bannerSwiper.swiper
-      },
-      // 设备类型
-      deviceType() {
-        return this.$store.state.common.common_deviceType
-      },
-      footer() {
-        return this.$store.state.common.deviceType === 'android'
-      },
-      // 最小额度
-      loanMin() {
-        return this.$store.state.loan.loan_min / 100
-      },
-      // 最大额度
-      loanMax() {
-        return this.$store.state.loan.loan_max / 100
-      },
-      // 申请额度(默认显示最大额度)
-      loanLimit: {
-        // getter
-        get: function() {
-          return this.$store.state.loan.loan_limit / 100
-        },
-        // setter
-        set: function(newValue) {
-          this.$store.commit('loan_limit_save', newValue * 100)
+    bannerItemLink(e, imgUrl) {
+      if (imgUrl === "") e.preventDefault();
+    },
+    selectLoanDuration(time) {
+      this.$store.commit("loan_duration_save", time);
+    },
+    loan() {
+      let loanAcctInfo = this.$store.state.common.common_loanAcctInfo;
+
+      // 判断应用初始化获取账户汇总信息是否成功(通过中银贷款账号是否存在进行判断)，获取失败后点击按钮重新获取账户汇总信息
+      if (loanAcctInfo.loanAcctNo) {
+        if (loanAcctInfo.creLineStus === "90") {
+          this.$router.push("/inactivated");
+        } else {
+          this.$router.push({name: 'loan'});
         }
-      },
-      loanDuration() {
-        return this.$store.state.loan.loan_duration
-      },
-      activeTabIndex() {
-        return this.$store.state.common.activeTabIndex
+      } else {
+        // 重新获取账户汇总信息
+        // this.reGetLoanAcctInfo()
+
+        // 重新初始化 防止第一步获取开户状态接口失败
+        this.init();
       }
     },
-    methods: {
-      bannerItemLink(e, imgUrl) {
-        if (imgUrl === '') e.preventDefault()
-      },
-      selectLoanDuration(time) {
-        this.$store.commit('loan_duration_save', time)
-      },
-      loan() {
-        let loanAcctInfo = this.$store.state.common.common_loanAcctInfo
-
-        // 判断应用初始化获取账户汇总信息是否成功(通过中银贷款账号是否存在进行判断)，获取失败后点击按钮重新获取账户汇总信息
-        if (loanAcctInfo.loanAcctNo) {
-          if (loanAcctInfo.creLineStus === '90') {
-            this.$router.push('/inactivated')
-          } else {
-            this.$router.push('/loan')
-          }
-        } else {
-          // 重新获取账户汇总信息
-          // this.reGetLoanAcctInfo()
-
-          // 重新初始化 防止第一步获取开户状态接口失败
-          this.init()
-        }
-      },
-      // 进入贷前'我的'
-      toMy() {
-        /* eslint-disable no-undef */
-        app.setLoanStatus(0)
-        this.app.toMy1()
-      }
-    }
+    // 进入贷前'我的'
+    // toMy() {
+    //   /* eslint-disable no-undef */
+    //   app.setLoanStatus(0);
+    //   this.app.toMy1();
+    // }
   }
+};
 </script>
 
 <style lang="stylus">
@@ -348,3 +368,4 @@
         height: 24px
         margin: 0 auto 5px auto
 </style>
+

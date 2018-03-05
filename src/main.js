@@ -42,38 +42,6 @@ Vue.prototype.closeLoading = function() {
   Indicator.close()
   // store.commit('common_isLoading_save', false)
 }
-// Vue.prototype.toast = function(options) {
-//   // 文本内容
-//   var message = ''
-//   // Toast 的位置
-//   var position = 'middle'
-//   // 持续时间（毫秒），若为 -1 则不会自动关闭
-//   var duration = 1200
-
-//   // 参数options需为Object
-//   if (options) {
-//     if (options.message) {
-//       message = options.message
-//     }
-//     if (options.position) {
-//       position = options.position
-//     }
-//     if (options.duration) {
-//       duration = options.duration
-//     }
-//   }
-
-//   var toastInstance = Toast({
-//     message: message,
-//     position: position,
-//     duration: duration
-//   })
-
-//   // if (toastInstance) {
-//   //   toastInstance.close()
-//   // }
-//   // console.log(toastInstance.timer)
-// }
 
 Vue.prototype.toast = function(options) {
   var obj = {
@@ -86,16 +54,10 @@ Vue.prototype.toast = function(options) {
   }
   obj = Object.assign(obj, options)
 
-  var toastInstance = Toast(obj)
-
-  // if (toastInstance) {
-  //   toastInstance.close()
-  // }
-  // console.log(toastInstance.timer)
+  Toast(obj)
 }
 
 Vue.prototype.goBack = function() {
-  // common_isLoading是否正在请求(默认false,请求期间屏蔽后退功能[注意：巨坑来了，如果在全局拦截中使用vuex-persist修改，一旦某个请求被catch到后js就不再执行，目前去掉了插件vuex-persist])
   let common_isLoading = store.state.common.common_isLoading
   if (common_isLoading) {
     return
@@ -123,7 +85,8 @@ function parseUrl() {
       || urlparam.indexOf('call') === -1
       || urlparam.indexOf('args') === -1
       || urlparam.indexOf('sign') === -1
-      || urlparam.indexOf('timestamp') === -1){
+      || urlparam.indexOf('timestamp') === -1)
+  {
     window.location.href = ledaikuanMainSite
     return
   }
@@ -166,14 +129,6 @@ Vue.prototype.signCheck = function() {
     'timestamp': obj.timestamp
   }
 
-  // let paramString2 = JSON.stringify({
-  //   'ua': 'hello',
-  //   'call': 'Account.signCheck',
-  //   'args': paramString,
-  //   'sign': 'sign',
-  //   'timestamp': new Date().getTime()
-  // })
-
   let call = 'Account.signCheck'
   let timestamp = new Date().getTime()
   let sign = this.getSign(call, timestamp)
@@ -192,7 +147,7 @@ Vue.prototype.signCheck = function() {
       if (res.data.returnCode === '000000') {
         let signKey = res.data.response
   
-        // 保存公共参数 20171030183000572767
+        // 保存公共参数
         store.commit('common_params_save', {
           ua: 'LDK_H5_SIGN',
           customerId: obj.args.customerId,
@@ -398,10 +353,6 @@ Vue.prototype.init = function() {
     })
   
     that.loading()
-    // Indicator.open({
-    //   text: '',
-    //   spinnerType: 'fading-circle'
-    // })
     that.$http.post(store.state.common.common_api, paramString).then(res => {
       let data = res.data
       if (data.returnCode === '000000') {
@@ -445,13 +396,6 @@ new Vue({
   template: '<App/>',
   components: { App },
   created() {
-    axios.defaults.method = 'post'
-    // if (process.env.NODE_ENV === 'development') {
-    //   axios.defaults.baseURL = config.api.dev + '/khw/c/h'
-    // } else if (process.env.NODE_ENV === 'production') {
-    //   axios.defaults.baseURL = config.api.pro
-    // }
-    // console.log(axios.defaults.baseURL)
     // `timeout` 指定请求超时的毫秒数(0 表示无超时时间)，如果请求超过 `timeout` 的时间，请求将被中断
     axios.defaults.timeout = 20000
 
@@ -462,11 +406,6 @@ new Vue({
     //   return data
     // }]
     axios.interceptors.request.use((config) => {
-      // Indicator.open({
-      //   text: '加载中...',
-      //   spinnerType: 'fading-circle'
-      // })
-
       // if (config.method.toLowerCase() === 'post') {
       //   config.data = qs.stringify(config.data)
       // }
@@ -484,12 +423,6 @@ new Vue({
     }, function(error) {
       Indicator.close()
       store.commit('common_isLoading_save', false)
-
-      // let toastInstance = Toast({
-      //   message: '获取数据失败，请稍后重试',
-      //   duration: 2000
-      // })
-      // store.commit('toastInstanceSave', toastInstance)
 
       Toast({
         message: '获取数据失败，请稍后重试',

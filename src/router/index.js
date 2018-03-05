@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from '../store'
 
-import Home from '@/views/home/home2'
+import Home from '@/views/home/home'
 import Audit from '@/views/home/audit'
 import Refuse from '@/views/home/refuse'
 import Loan from '@/views/loan/loan'
@@ -34,19 +34,6 @@ const routes = [
     path: '/',
     name: 'home',
     component: Home,
-    // beforeEnter: (to, from, next) => {
-    //   // 保存公共参数 20171030183000572767
-    //   if (window.location.href.indexOf('?') !== -1) {
-    //     let customerId = window.location.href.split('?')[1].split('=')[1]
-    //     store.commit('common_params_save', {
-    //       ua: 'Ledaikuan_H5_Sign',
-    //       customerId: customerId
-    //     })
-    //   } else {
-    //     window.location.href = 'http://www.ledaikuan.cn/'
-    //   }
-    //   next()
-    // }
   },
   {
     path: '/audit',
