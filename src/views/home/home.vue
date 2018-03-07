@@ -240,7 +240,7 @@ export default {
       left: 15px
       width: 32px
       height: 32px
-      background: url(../../assets/img/icon_my.png) no-repeat center/32px 32px
+      background: url("../../assets/img/icon_my.png") no-repeat center/32px 32px
       z-index: 9
     .kefu
       position: absolute
@@ -248,7 +248,7 @@ export default {
       right: 15px
       width: 32px
       height: 32px
-      background: url(../../assets/img/icon_kefu.png) no-repeat center/32px 32px
+      background: url("../../assets/img/icon_kefu.png") no-repeat center/32px 32px
       z-index: 9
       img
         width: 100%

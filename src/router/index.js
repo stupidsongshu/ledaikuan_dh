@@ -16,16 +16,6 @@ import RepayDeal from '@/views/repay/repayDeal'
 import Rate from '@/views/other/rate'
 import Survey from '@/views/survey/index'
 
-// 贷前
-import AuthLogin from '@/views/home/authLogin'
-import LivingBody from '@/views/auth/livingBody/livingBody'
-import Idcard from '@/views/auth/idcard/idcard'
-import Bankcard from '@/views/auth/bankcard/bankcard'
-import BaseInfo from '@/views/auth/baseInfo/baseInfo'
-import Video from '@/views/auth/video/video'
-import Summary from '@/views/auth/summary/summary'
-import WaitAudit from '@/views/auth/waitAudit/waitAudit'
-
 Vue.use(Router)
 
 /**
@@ -100,47 +90,6 @@ const routes = [
     path: '/survey',
     name: 'survey',
     component: Survey
-  },
-  // 贷前
-  {
-    path: '/authLogin',
-    name: 'authLogin',
-    component: AuthLogin
-  },
-  {
-    path: '/livingBody',
-    name: 'livingBody',
-    component: LivingBody
-  },
-  {
-    path: '/idcard',
-    name: 'idcard',
-    component: Idcard
-  },
-  {
-    path: '/bankcard',
-    name: 'bankcard',
-    component: Bankcard
-  },
-  {
-    path: '/baseInfo',
-    name: 'baseInfo',
-    component: BaseInfo
-  },
-  {
-    path: '/video',
-    name: 'video',
-    component: Video
-  },
-  {
-    path: '/summary',
-    name: 'summary',
-    component: Summary
-  },
-  {
-    path: '/waitAudit',
-    name: 'waitAudit',
-    component: WaitAudit
   }
 ]
 
