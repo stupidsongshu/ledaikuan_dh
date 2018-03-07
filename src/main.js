@@ -11,6 +11,7 @@ import md5 from 'blueimp-md5'
 import { Header, Button, Popup, Picker, Indicator, Toast, Range } from 'mint-ui'
 
 import './assets/css/common.css'
+import './assets/iconfont/iconfont.css'
 
 Vue.config.productionTip = false
 
@@ -431,7 +432,7 @@ new Vue({
       return Promise.reject(error)
     })
 
-    this.init()
+    // this.init()
   }
 })
 

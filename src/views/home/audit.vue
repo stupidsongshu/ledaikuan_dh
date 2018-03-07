@@ -1,10 +1,10 @@
 <template>
   <div class="audit no-header">
-      <div class="audit-title">
-				<span class="icon-audit"></span> 资料已提交，请等待审核
-			</div>
-			<p>您的资料已经被加密保存，审核期间暂时不可修改。</p>
-			<p>一经审核通过，我们将会立即通知您，敬请留意手机短信通知，或者登录乐贷款APP查看审核结果。</p>
+		<div class="audit-title">
+			<span class="icon-audit"></span> 资料已提交，请等待审核
+		</div>
+		<p>您的资料已经被加密保存，审核期间暂时不可修改。</p>
+		<p>一经审核通过，我们将会立即通知您，敬请留意手机短信通知，或者登录乐贷款APP查看审核结果。</p>
   </div>
 </template>
 

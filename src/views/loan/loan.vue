@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="common-btn" style="margin: 15px 0;">
+    <div class="common-btn" style="margin: 15px 0;padding: 0 15px;">
       <mt-button class="btn" @click="loanBtn" :disabled="!checked">立即借款</mt-button>
     </div>
 
