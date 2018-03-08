@@ -431,7 +431,7 @@ new Vue({
       return Promise.reject(error)
     })
 
-    // this.init()
+    this.init()
   }
 })
 
