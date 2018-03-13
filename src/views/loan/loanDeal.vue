@@ -17,7 +17,7 @@
       <b>友情提示：</b>贷款用户需在到期还款日前还款，逾期不还将依法报送人民银行征信系统，未来可能会对您找工作、办理签证、车贷、房贷造成影响。
     </p>
 
-    <div class="common-btn" v-show="status > 1">
+    <div class="common-btn" v-show="status > 1" style="padding: 0 15px;">
       <mt-button class="btn" disabled>{{restTime}}s后返回</mt-button>
     </div>
 

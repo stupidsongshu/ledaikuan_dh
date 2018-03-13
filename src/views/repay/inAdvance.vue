@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="common-btn" style="margin-top: 20px;">
+    <div class="common-btn" style="padding: 0 15px;margin-top: 20px;">
       <mt-button class="btn" @click="inAdvanceRepay" :disabled="disabledBtn">立即还款</mt-button>
     </div>
 
@@ -137,7 +137,7 @@
           } else {
             that.disabledBtn = false
             that.toast({
-              messahe: data.returnMsg
+              message: data.returnMsg
             })
 
             // 重新获取账户汇总信息
