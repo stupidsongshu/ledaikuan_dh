@@ -74,7 +74,7 @@
       margin: 20px 0
       padding: 10px 0
       line-height: 24px
-      border: 1px solid #d9d9d9
+      border: 1px solid #d9d9d9; /*no*/
       background-color: #fff
       li
         display: flex

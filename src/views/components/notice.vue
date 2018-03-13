@@ -1,5 +1,5 @@
  <template>
-  <div class="swiper-container notice-swiper-container">
+  <div class="swiper-container notice-swiper-container swiper-no-swiping">
     <div class="swiper-wrapper">
       <div class="swiper-slide phone-item" v-for="(user, index) in list" :key="index">
         {{user.phone}}成功借款{{user.amount}}元用于{{user.purpose}}消费
@@ -24,7 +24,12 @@
       }
     },
     mounted() {
-        this.swiperInit()
+      let swiper = new Swiper('.notice-swiper-container', {
+        direction: 'vertical',
+        autoplay: 3000,
+        autoplayDisableOnInteraction: false,
+        loop: true
+      })
     },
     created() {
       /*
@@ -88,37 +93,6 @@
         var purpose = this.loanPurpose[Math.floor(Math.random() * this.loanPurpose.length)]
 
         this.list.push({phone: phone,amount: amount,purpose: purpose})
-      }
-    },
-    methods: {
-      swiperInit() {
-        let swiper = new Swiper('.notice-swiper-container', {
-          direction: 'vertical',
-          autoplay: {
-            delay: 3000,
-            disableOnInteraction: false
-          },
-          loop: true,
-  
-          // 如果需要分页器
-          pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-          },
-
-          // 如果需要前进后退按钮
-          // navigation: {
-          //   nextEl: '.swiper-button-next',
-          //   prevEl: '.swiper-button-prev',
-          // },
-
-          // 如果需要滚动条
-          // scrollbar: {
-          //   el: '.swiper-scrollbar',
-          // },
-        })
-
-        swiper.allowTouchMove = false;
       }
     }
   }

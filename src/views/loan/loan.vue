@@ -49,8 +49,9 @@
         <div class="agreement-wrapper">
           <input type="checkbox" id="agreementInput" :checked="checked" @click="toggleAgree">
           <label class="agreement-label" for="agreementInput">我同意并知晓</label>
-          <a v-if="deviceType === 'android'" class="agreement" href="http://xfjr.ledaikuan.cn/ledaikuan/agreement/loan_protocol_additional.html">《借款协议》</a>
-          <a v-if="deviceType === 'iphone'" class="agreement" @click="loanAgreementPage">《借款补充协议》</a>
+          <!-- <a v-if="deviceType === 'android'" class="agreement" href="http://xfjr.ledaikuan.cn/ledaikuan/agreement/loan_protocol_additional.html">《借款协议》</a>
+          <a v-if="deviceType === 'iphone'" class="agreement" @click="loanAgreementPage">《借款补充协议》</a> -->
+          <a class="agreement" href="http://xfjr.ledaikuan.cn/ledaikuan/agreement/loan_protocol_additional.html">《借款协议》</a>
         </div>
       </div>
 
@@ -136,16 +137,11 @@
       loanDuration() {
         return this.$store.state.loan.loan_duration
       },
-      // hasPopup() {
-      //   return this.$store.state.common.common_hasPopup
-      // },
       hasPopup: {
         get() {
           return this.$store.state.common.common_hasPopup
         },
-        set() {
-          
-        }
+        set() {}
       }
     },
     created() {
@@ -273,7 +269,7 @@
           }
         ]
         function randomSort() {
-          return Math.random() > 0.5 ? -1 : 1
+          return Math.random() - 0.5
         }
         this.loanPurposeValues.sort(randomSort)
         this.loanPurposeValues.unshift({

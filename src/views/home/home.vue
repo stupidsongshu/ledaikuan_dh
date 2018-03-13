@@ -1,8 +1,8 @@
 <template>
   <div class="index no-header" :class="{'has-footer': footer}">
     <div class="banner-wrapper">
-      <div class="my"></div>
-      <div class="kefu"></div>
+      <!-- <div class="my"></div>
+      <div class="kefu"></div> -->
 
       <div class="swiper-container banner-swiper-container">
         <div class="swiper-wrapper">
@@ -53,26 +53,13 @@
     <mt-button class="loan-btn" @click="loan">立即借款</mt-button>
 
     <div class="footer-txt">"乐贷款"由麦广互娱与中银消费金融联合打造</div>
-
-    <!-- <mt-tabbar fixed v-if="deviceType === 'android'">
-      <mt-tab-item id="loan">
-        <div class="self-tab-item">
-          <span class="isSelected">借款</span>
-        </div>
-      </mt-tab-item>
-      <mt-tab-item id="my">
-        <div class="self-tab-item">
-          <span>我的</span>
-        </div>
-      </mt-tab-item>
-    </mt-tabbar> -->
   </div>
 </template>
 
 <script>
-import notice from "./../components/notice";
 import Swiper from "swiper";
 import 'swiper/dist/css/swiper.css'
+import notice from "./../components/notice";
 
 export default {
   name: "home",
@@ -81,26 +68,27 @@ export default {
   },
   data() {
     return {
-      bannerList: [],
-      swiperOption: {
-        autoplay: {
-          delay: 3000,
-          disableOnInteraction: false
-        },
-        speed: 800,
-        loop: true,
-        pagination: {
-          el: ".swiper-pagination",
-          bulletActiveClass: "my-bullet-active"
-        },
-        observer: true,
-        observeParents: true
-      }
+      bannerList: []
     };
   },
   mounted() {
+    let bannerSwiper = new Swiper('.banner-swiper-container', {
+      autoplay: 3000,
+      autoplayDisableOnInteraction: false,
+      speed: 600,
+      loop: true,
+      pagination: '.swiper-pagination',
+      paginationClickable: true,
+      observer: true, // 修改swiper自己或子元素时，自动初始化swiper
+      observeParents: true // 修改swiper的父元素时，自动初始化swiper
+    })
+
     this.$http.get("http://ledaikuan.cn:8080/activity/Index/banner").then(res => {
       this.bannerList = res.data;
+      this.$nextTick(() => {
+        bannerSwiper.startAutoplay() // 重新开始轮播
+        bannerSwiper.reLoop() // 重新计算slides个数
+      })
     });
   },
   computed: {
@@ -132,39 +120,15 @@ export default {
     },
     loanDuration() {
       return this.$store.state.loan.loan_duration;
-    },
-    activeTabIndex() {
-      return this.$store.state.common.activeTabIndex;
     }
-  },
-  updated() {
-    this.swiperInit()
   },
   methods: {
     swiperInit() {
       let swiper = new Swiper('.banner-swiper-container', {
-        autoplay: {
-          delay: 3000,
-          disableOnInteraction: false
-        },
+        autoplay: 3000,
+        autoplayDisableOnInteraction: false,
         loop: true,
-  
-        // 如果需要分页器
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-
-        // 如果需要前进后退按钮
-        // navigation: {
-        //   nextEl: '.swiper-button-next',
-        //   prevEl: '.swiper-button-prev',
-        // },
-
-        // 如果需要滚动条
-        // scrollbar: {
-        //   el: '.swiper-scrollbar',
-        // },
+        pagination: '.swiper-pagination'
       })
     },
     bannerItemLink(e, imgUrl) {
@@ -190,13 +154,7 @@ export default {
         // 重新初始化 防止第一步获取开户状态接口失败
         this.init();
       }
-    },
-    // 进入贷前'我的'
-    // toMy() {
-    //   /* eslint-disable no-undef */
-    //   app.setLoanStatus(0);
-    //   this.app.toMy1();
-    // }
+    }
   }
 };
 </script>
@@ -234,25 +192,25 @@ export default {
     position: relative
     width: 100%
     height: 162px
-    .my
-      position: absolute
-      top: 20px
-      left: 15px
-      width: 32px
-      height: 32px
-      background: url("../../assets/img/icon_my.png") no-repeat center/32px 32px
-      z-index: 9
-    .kefu
-      position: absolute
-      top: 20px
-      right: 15px
-      width: 32px
-      height: 32px
-      background: url("../../assets/img/icon_kefu.png") no-repeat center/32px 32px
-      z-index: 9
-      img
-        width: 100%
-        height: 162px
+    // .my
+    //   position: absolute
+    //   top: 20px
+    //   left: 15px
+    //   width: 32px
+    //   height: 32px
+    //   background: url("../../assets/img/icon_my.png") no-repeat center/32px 32px
+    //   z-index: 9
+    // .kefu
+    //   position: absolute
+    //   top: 20px
+    //   right: 15px
+    //   width: 32px
+    //   height: 32px
+    //   background: url("../../assets/img/icon_kefu.png") no-repeat center/32px 32px
+    //   z-index: 9
+    //   img
+    //     width: 100%
+    //     height: 162px
 
   .range
     width: 100%
@@ -299,7 +257,7 @@ export default {
         flex: 1
         height: 36px
         color: #666
-        border: 1px solid #46ae46
+        border: 1px solid #46ae46; /*no*/
         border-top-left-radius: 18px
         border-bottom-left-radius: 18px
         border-top-right-radius: 18px
@@ -368,4 +326,3 @@ export default {
         height: 24px
         margin: 0 auto 5px auto
 </style>
-

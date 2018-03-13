@@ -3,12 +3,12 @@
  */
 const state = {
     /**
-     * loan_duration 贷款期数(单位:月 默认6月)
+     * loan_duration 贷款期数(单位:月 默认12月)
      * loan_limit    贷款额度(单位:分 默认20000元)
      * loan_min      最小额度(单位:分 默认500元)
      * loan_max      最大额度(单位:分 默认20000元)
      */
-    loan_duration: 6,
+    loan_duration: 12,
     loan_limit: 2000000,
     loan_min: 50000,
     loan_max: 2000000

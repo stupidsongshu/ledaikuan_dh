@@ -39,7 +39,7 @@
     </div>
 
     <div class="common-btn">
-      <mt-button class="btn" :disabled="disabledBtn" @click="">立即还款</mt-button>
+      <mt-button class="btn" :disabled="disabledBtn" @click="overdueRepay">立即还款</mt-button>
     </div>
 
     <ul class="friendly-tip" style="margin-top: 20px;">
@@ -75,7 +75,8 @@
     methods: {
       back() {
         this.goBack()
-      }
+      },
+      overdueRepay() {}
     }
   }
 </script>
