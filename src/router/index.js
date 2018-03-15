@@ -34,7 +34,10 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta: {
+      keepAlive: true
+    }
   },
   {
     path: '/audit',
